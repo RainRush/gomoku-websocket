@@ -18,6 +18,7 @@ app.use(router);
 
 io.on('connection', (socket) => {
   socket.on('join', ({ name, room }, callback) => {
+    console.log(`${name} had joined room ${room}`);
     const { error, user } = addUser({ id: socket.id, name, room });
 
     if (error) return callback(error);
@@ -49,7 +50,7 @@ io.on('connection', (socket) => {
 
   socket.on('sendMessage', (message, callback) => {
     const user = getUser(socket.id);
-    console.log('message', message);
+    console.log(`user ${user.name}: message ${message}`);
 
     if (user) {
       io.to(user.room).emit('message', { user: user.name, text: message });
@@ -102,6 +103,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     const user = removeUser(socket.id);
+    console.log(`user ${user.name} left the room`);
 
     if (user) {
       io.to(user.room).emit('message', {
